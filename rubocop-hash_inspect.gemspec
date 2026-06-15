@@ -29,10 +29,8 @@ Gem::Specification.new do |spec|
     'default_lint_roller_plugin' => 'RuboCop::HashInspect::Plugin'
   }
 
-  # D-15: reject filter — ship only lib/, config/, LICENSE, README, CHANGELOG
-  spec.files = `git ls-files -z`.split("\x0").reject do |f|
-    f.match(%r{^(spec|\.github|\.planning)/|^\.|^bin/})
-  end
+  # D-15: explicit allowlist — ship only these paths; no top-level dev/internal files can leak
+  spec.files = Dir.glob(%w[lib/**/*.rb config/default.yml LICENSE README.md CHANGELOG.md])
 
   spec.require_paths = ['lib']
 
