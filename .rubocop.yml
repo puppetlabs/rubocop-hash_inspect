@@ -1,0 +1,7 @@
+plugins:
+  - rubocop-internal_affairs
+  - rubocop-hash_inspect
+
+Naming/FileName:
+  Exclude:
+    - lib/rubocop-hash_inspect.rb
