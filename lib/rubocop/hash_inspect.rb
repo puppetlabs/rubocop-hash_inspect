@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative "hash_inspect/version"
+require_relative 'hash_inspect/version'
 
 module RuboCop
   module HashInspect
