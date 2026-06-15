@@ -10,8 +10,8 @@ module RuboCop
         LintRoller::About.new(
           name: 'rubocop-hash_inspect',
           version: VERSION,
-          homepage: "TODO: Put your plugin's homepage URL here.",
-          description: "TODO: Put your plugin's description here."
+          homepage: 'https://github.com/puppetlabs/rubocop-hash_inspect',
+          description: 'A RuboCop extension that flags reliance on legacy Hash#inspect output format.'
         )
       end
 

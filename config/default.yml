@@ -1,1 +1,2 @@
-# Write it!
+# This file intentionally contains no cop configuration for Phase 1.
+# The HashInspect/LegacyHashInspectFormat cop block is added in Phase 2 via `rake new_cop`.
