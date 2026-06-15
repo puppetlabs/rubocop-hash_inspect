@@ -1,6 +1,10 @@
 plugins:
   - rubocop-internal_affairs
   - rubocop-hash_inspect
+  - rubocop-rspec
+
+AllCops:
+  NewCops: enable
 
 Naming/FileName:
   Exclude:
