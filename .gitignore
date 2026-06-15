@@ -1,1 +1,15 @@
 .planning/
+
+# Gem build artifacts
+*.gem
+/.bundle/
+/coverage/
+/doc/
+/pkg/
+/spec/reports/
+/tmp/
+/_yardoc/
+/.yardoc/
+
+# Lockfile (library convention — do not commit per D-09)
+Gemfile.lock
