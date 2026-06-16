@@ -6,6 +6,12 @@ plugins:
 AllCops:
   NewCops: enable
 
+# D-23: Do not dogfood the HashInspect cop on the gem's own source.
+# The MSG constant and gemspec description contain the legacy-format literal
+# intentionally (as documentation). Disabling here avoids false self-flags.
+HashInspect/LegacyHashInspectFormat:
+  Enabled: false
+
 Naming/FileName:
   Exclude:
     - lib/rubocop-hash_inspect.rb
