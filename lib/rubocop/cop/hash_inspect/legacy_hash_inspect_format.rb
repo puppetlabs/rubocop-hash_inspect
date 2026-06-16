@@ -18,6 +18,13 @@ module RuboCop
       # for v1 (kept to protect the clean-module baseline — FAM-03, v2).
       # Comments and real Ruby hash literal nodes are not scanned by construction.
       #
+      # Known heuristic limitation (WR-02): an interpolated string whose symbol
+      # KEY name is dynamic, e.g. `"{:#{key}=>1}"`, is not detected. The key
+      # name is unknown at static-analysis time, and the interpolation-gap
+      # sentinel (WR-01 fix) also prevents fabricating a signature across the
+      # `#{}` boundary. This is an intentional, documented non-detection; it is
+      # not an accidental gap.
+      #
       # @example
       #   # bad - hardcoded legacy Hash#inspect output
       #   expect(result).to eq("{:a=>1}")
@@ -61,29 +68,46 @@ module RuboCop
           add_offense(node) if value.is_a?(String) && LEGACY_SIGNATURE.match?(value)
         end
 
-        # Called on every `dstr` (interpolated string) node. Concatenates only
-        # the literal `str_type?` child segments (gaps from `#{…}` interpolation
-        # are left empty), then fires on the outer dstr node on match (D-05, D-07).
-        # E.g. `"{:a=>#{v}}"` produces static text `{:a=>` which matches.
+        # Called on every `dstr` (interpolated string) node. Maps over ALL
+        # children: literal `str_type?` segments contribute their text value;
+        # each interpolation (`begin`/`send`/etc.) node is replaced by the
+        # sentinel `' } '` (space + closing-brace + space). This prevents the
+        # regex from matching a signature fabricated across a `#{}` boundary
+        # (WR-01 fix): the `}` in the sentinel terminates `[^}]*`, and the
+        # spaces break any `:sym=>`/`\w+` run.
+        # E.g. `"{:a=>#{v}}"` produces `"{:a=> } "` which still matches because
+        # the full `{:a=>` is in the static segment before the sentinel.
+        # E.g. `"{#{prefix}:role=>admin}"` produces `"{ }  :role=>admin}"` which
+        # does NOT match because `{` and `:role=>` are separated by the sentinel.
         def on_dstr(node)
-          static_text = node.children
-                            .select(&:str_type?)
-                            .map { |child| child.children.first }
-                            .join
+          static_text = static_text_with_sentinels(node)
           add_offense(node) if LEGACY_SIGNATURE.match?(static_text)
         end
 
-        # Called on every `regexp` node. Concatenates `str_type?` children as
-        # above, then normalizes escaped braces (`\{`->`{`, `\}`->`}`) so that
+        # Called on every `regexp` node. Applies the same sentinel-aware
+        # concatenation as `on_dstr` via `static_text_with_sentinels`, then
+        # normalizes escaped braces (`\{`->`{`, `\}`->`}`) so that
         # `/\{:a=>1\}/` matches the same brace-anchored signature as the string
-        # form (D-06, D-07).
+        # form (D-06, D-07). The gsub unescape step runs on the joined text
+        # after sentinel insertion, exactly preserving WR-03's load-bearing
+        # behaviour for `%r{\{...\}}` patterns.
         def on_regexp(node)
-          static_text = node.children
-                            .select(&:str_type?)
-                            .map { |child| child.children.first }
-                            .join
+          static_text = static_text_with_sentinels(node)
           unescaped = static_text.gsub('\\{', '{').gsub('\\}', '}')
           add_offense(node) if LEGACY_SIGNATURE.match?(unescaped)
+        end
+
+        private
+
+        # Returns a string formed by joining each child of `node`: literal
+        # `str_type?` children contribute their text; all other children
+        # (interpolations) contribute the sentinel `' } '`. The `}` in the
+        # sentinel terminates the regex's `[^}]*` run so a LEGACY_SIGNATURE
+        # cannot be fabricated across an interpolation boundary (WR-01).
+        def static_text_with_sentinels(node)
+          node.children.map do |child|
+            child.str_type? ? child.children.first : ' } '
+          end.join
         end
       end
     end
