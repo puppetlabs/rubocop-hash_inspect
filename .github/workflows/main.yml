@@ -29,3 +29,19 @@ jobs:
 
       - name: Run tests and self-lint
         run: bundle exec rake
+
+  baseline:
+    name: Baseline corpus (zero false positives)
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Ruby 3.4
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.4'
+          bundler-cache: true
+
+      - name: Run baseline validation
+        run: bundle exec rake baseline
