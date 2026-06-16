@@ -15,3 +15,9 @@ HashInspect/LegacyHashInspectFormat:
 Naming/FileName:
   Exclude:
     - lib/rubocop-hash_inspect.rb
+
+# Rake task definitions are inherently long single blocks; excluding the
+# Rakefile from BlockLength matches RuboCop's own project convention.
+Metrics/BlockLength:
+  Exclude:
+    - Rakefile

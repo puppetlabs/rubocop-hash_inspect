@@ -63,7 +63,7 @@ task :baseline do
       YAML
 
       puts "Running cop on #{name}..."
-      cmd = "bundle exec rubocop --only HashInspect/LegacyHashInspectFormat " \
+      cmd = 'bundle exec rubocop --only HashInspect/LegacyHashInspectFormat ' \
             "--config #{config_path} --format progress #{clone_dir}"
       stdout, stderr, status = Open3.capture3(cmd)
 
