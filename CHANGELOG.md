@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- `HashInspect/LegacyHashInspectFormat` cop: flags string, interpolated-string, and
+  regexp literals containing the legacy `Hash#inspect` output format
+  (`{:sym=>val}`, Ruby <= 3.3). Ruby 3.4 changed `Hash#inspect` to `{sym: val}`;
+  hardcoded strings using the old format break on Ruby 3.4 / Puppet 9
+  ([Ruby Bug #20433](https://bugs.ruby-lang.org/issues/20433)).
+
 ## [0.1.0] - 2026-06-15
 
 ### Added

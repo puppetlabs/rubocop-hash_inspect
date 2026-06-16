@@ -1,7 +1,14 @@
-# This file intentionally contains no cop configuration for Phase 1.
-# The HashInspect/LegacyHashInspectFormat cop block is added in Phase 2 via `rake new_cop`.
-
 HashInspect/LegacyHashInspectFormat:
-  Description: 'TODO: Write a description of the cop.'
-  Enabled: pending
-  VersionAdded: '<<next>>'
+  Description: >-
+    Detects string or regexp literals containing the legacy Hash#inspect output
+    format (Ruby <= 3.3 brace-anchored symbol rocket: `{:sym=>val}`). This format
+    changed in Ruby 3.4 (Bug #20433). Hardcoded strings using the old format
+    break on Ruby 3.4 / Puppet 9. Update to the new format or use a dynamic
+    assertion that does not depend on inspect output.
+  Enabled: true
+  Severity: convention
+  Safe: true
+  SafeAutoCorrect: false
+  VersionAdded: '1.0'
+  References:
+    - https://bugs.ruby-lang.org/issues/20433
