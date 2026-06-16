@@ -51,7 +51,12 @@ module RuboCop
         # Called on every `str` (plain string literal) node. Reads the node's
         # unescaped String value (never `node.source` — D-10) and fires an
         # offense on the outer node when it matches LEGACY_SIGNATURE (D-07).
+        # Skips `str` nodes that are literal segments inside a `dstr` or
+        # `regexp` — those are handled by `on_dstr`/`on_regexp` which report
+        # on the outer node (D-07). Prevents duplicate offenses.
         def on_str(node)
+          return if node.parent&.type?(:dstr, :regexp)
+
           value = node.children.first
           add_offense(node) if value.is_a?(String) && LEGACY_SIGNATURE.match?(value)
         end
