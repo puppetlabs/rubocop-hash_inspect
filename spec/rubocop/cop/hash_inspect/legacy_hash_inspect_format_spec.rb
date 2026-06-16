@@ -173,4 +173,40 @@ RSpec.describe RuboCop::Cop::HashInspect::LegacyHashInspectFormat, :config do
       RUBY
     end
   end
+
+  # --- Regression specs for interpolation-boundary handling (WR-01 / WR-02) ---
+
+  context 'with a dynamic prefix before the rocket signature (WR-01)' do
+    # WR-01 regression guard: before the sentinel fix, on_dstr joined segments
+    # "{" + ":role=>admin}" = "{:role=>admin}" which matched LEGACY_SIGNATURE,
+    # producing a false offense. The runtime value is e.g. "{user:role=>admin}"
+    # which is NOT a legacy Hash#inspect string. See 02-VERIFICATION.md WR-01.
+    it 'does not register when a dynamic prefix precedes the rocket pattern' do
+      expect_no_offenses(<<~'RUBY')
+        eq("{#{prefix}:role=>admin}")
+      RUBY
+    end
+  end
+
+  context 'with an interpolated symbol key — documented heuristic non-detection (WR-02)' do
+    # WR-02 documented behavior: a genuine legacy form whose KEY name is dynamic,
+    # e.g. "{:#{key}=>1}", is intentionally not detected. The key name is unknown
+    # at static-analysis time, and the interpolation-gap sentinel (WR-01 fix)
+    # also prevents fabricating a signature across the #{} boundary.
+    # This is a known, intentional heuristic limitation — not an accidental gap.
+    # See 02-VERIFICATION.md WR-02 and the cop class docstring.
+    it 'does not register for an interpolated symbol key (intentional non-detection, WR-02)' do
+      expect_no_offenses(<<~'RUBY')
+        eq("{:#{key}=>1}")
+      RUBY
+    end
+  end
+
+  context 'with new-format value containing an arrow (IN-03)' do
+    it 'does not register for new-format hash output with arrow in value' do
+      expect_no_offenses(<<~RUBY)
+        eq("{a: x => y}")
+      RUBY
+    end
+  end
 end
