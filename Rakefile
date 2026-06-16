@@ -57,6 +57,7 @@ task :baseline do
         AllCops:
           DisabledByDefault: true
           NewCops: enable
+          TargetRubyVersion: 3.4
         HashInspect/LegacyHashInspectFormat:
           Enabled: true
       YAML
