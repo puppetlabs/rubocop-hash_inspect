@@ -16,7 +16,6 @@ jobs:
         ruby:
           - '3.2'
           - '3.4'
-          - 'jruby-9.4.2.0'
     steps:
       - uses: actions/checkout@v4
       - name: "Set up Ruby ${{ matrix.ruby }}"
