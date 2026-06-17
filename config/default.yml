@@ -9,6 +9,6 @@ HashInspect/LegacyHashInspectFormat:
   Severity: convention
   Safe: true
   SafeAutoCorrect: false
-  VersionAdded: '1.0'
+  VersionAdded: '0.2'
   References:
     - https://bugs.ruby-lang.org/issues/20433
