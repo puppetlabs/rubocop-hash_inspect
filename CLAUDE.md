@@ -128,6 +128,18 @@ Architecture not yet mapped. Follow existing patterns found in the codebase.
 No project skills found. Add skills to any of: `.claude/skills/`, `.agents/skills/`, `.cursor/skills/`, `.github/skills/`, or `.codex/skills/` with a `SKILL.md` index file.
 <!-- GSD:skills-end -->
 
+## Hard Constraints
+
+- At the start of a coding session, review the repository structure and any relevant README or documentation files to understand the area you are working in.
+- Always read the files relevant to the task before suggesting or making a change.
+- Never merge a pull request.
+- Never work directly on the `main` or `master` branch.
+- Never push a branch without explicit instruction.
+- Never delete a file without permission — this applies even after a blanket "yes to all".
+- Never output, log, save, or hardcode security-sensitive values — this includes passwords, tokens, API keys, private keys, secrets, and credentials of any kind. Do not write them to files, include them in commit messages, or print them in responses.
+
+These rules are enforced by `PreToolUse` Bash hooks in `.claude/` (`no-pr-merge.sh`, `no-main-commits.sh`, `no-push.sh`, `no-rm.sh`), which block the matching commands rather than relying on the model to comply.
+
 <!-- GSD:workflow-start source:GSD defaults -->
 ## GSD Workflow Enforcement
 
