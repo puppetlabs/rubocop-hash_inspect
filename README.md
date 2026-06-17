@@ -6,8 +6,6 @@ A RuboCop extension gem that flags Ruby code relying on the **legacy (Ruby <= 3.
 those literals statically during `pdk validate` so Puppet module authors can fix them
 before upgrading to Puppet 9 (Ruby 4).
 
-> **TODO (DOC-01, Phase 3):** Replace stub content with full documentation.
-
 ## Why This Matters — Ruby 3.4 Hash#inspect Change
 
 Ruby 3.4 (December 2024) changed the output of `Hash#inspect`:
@@ -20,9 +18,13 @@ This cop detects the legacy rocket-syntax format inside string and regexp litera
 
 ## Installation
 
-> **TODO (DOC-01):** Add RubyGems install instructions after gem is published.
+Add to your `Gemfile` (development group):
 
-Add to your `.rubocop.yml` (preferred — requires RuboCop >= 1.72):
+```ruby
+gem 'rubocop-hash_inspect', '~> 0.2', require: false
+```
+
+Then add to your `.rubocop.yml` (preferred — requires RuboCop >= 1.72):
 
 ```yaml
 plugins:
@@ -38,16 +40,46 @@ require:
 
 ## Usage
 
-> **TODO (DOC-01):** Document `HashInspect/LegacyHashInspectFormat` cop configuration,
-> examples of flagged and clean code, and configuration options.
-
 Once loaded, the cop `HashInspect/LegacyHashInspectFormat` runs automatically as part
 of `rubocop` (or `pdk validate` when wired via `pdk-templates`).
 
 ### Cop: `HashInspect/LegacyHashInspectFormat`
 
-> **TODO (DOC-01):** Full cop documentation including offense examples and remediation
-> guidance.
+Flags string, regexp, and interpolated-string literals that contain the legacy
+`Hash#inspect` rocket-syntax format (`{:sym=>val}`), which breaks on Ruby 3.4 / Puppet 9.
+
+#### Example — flagged (legacy format)
+
+```ruby
+# Legacy format — breaks on Ruby 3.4 / Puppet 9
+expect(result.inspect).to eq("{:a=>1}")
+expect(msg).to match(/\{:name=>"foo"\}/)
+```
+
+#### Example — correct
+
+```ruby
+# New format — correct on Ruby >= 3.4
+expect(result.inspect).to eq("{a: 1}")
+expect(msg).to match(/\{name: "foo"\}/)
+# Or better: use a matcher that doesn't depend on inspect output:
+expect(result).to eq({ a: 1 })
+```
+
+#### Offense message
+
+> `Legacy \`Hash#inspect\` format (\`{:sym=>...}\`). Ruby 3.4+ renders hashes as \`{sym: ...}\`, so this hardcoded value breaks on Ruby 3.4 / Puppet 9. Update it to the new format.`
+
+#### Disable or configure
+
+```yaml
+# Disable for a specific file (inline):
+# rubocop:disable HashInspect/LegacyHashInspectFormat
+
+# Disable globally in .rubocop.yml:
+HashInspect/LegacyHashInspectFormat:
+  Enabled: false
+```
 
 ## Development
 
